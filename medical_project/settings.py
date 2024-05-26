@@ -38,6 +38,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'medical_app',  # Ensure this is included
+    'corsheaders',
+
 ]
 
 
@@ -53,7 +55,19 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',    
+
+
 ]
+
+CORS_ALLOW_ALL_ORIGINS = True
+CSRF_COOKIE_NAME = "csrftoken"
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:4200",  # Angular app URL
+    "http://127.0.0.1:4200",
+]
+
+
 
 ROOT_URLCONF = 'medical_project.urls'
 
