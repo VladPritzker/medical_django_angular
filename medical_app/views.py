@@ -1,6 +1,7 @@
 from django.http import JsonResponse, HttpResponseBadRequest, HttpResponseNotAllowed
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
+from django.contrib.auth import authenticate
 from .models import CustomUser
 import json
 
@@ -15,15 +16,32 @@ def users(request, user_id=None):
     elif request.method == 'POST':
         try:
             data = json.loads(request.body)
-            username = data.get('username')
-            email = data.get('email')
-            password = data.get('password')
+            if 'username' in data:
+                # Register new user
+                username = data.get('username')
+                email = data.get('email')
+                password = data.get('password')
 
-            if not username or not email or not password:
-                return HttpResponseBadRequest("Username, email, and password are required fields")
+                if not username or not email or not password:
+                    return HttpResponseBadRequest("Username, email, and password are required fields")
 
-            user = CustomUser.objects.create_user(username=username, email=email, password=password)
-            return JsonResponse({'id': user.id, 'username': user.username, 'email': user.email}, status=201)
+                user = CustomUser.objects.create_user(username=username, email=email, password=password)
+                return JsonResponse({'id': user.id, 'username': user.username, 'email': user.email}, status=201)
+            else:
+                # Login user
+                email = data.get('email')
+                password = data.get('password')
+                if not email or not password:
+                    return HttpResponseBadRequest("Email and password are required fields")
+
+                try:
+                    user = CustomUser.objects.get(email=email)
+                    if user.check_password(password):
+                        return JsonResponse({'message': 'Login successful'}, status=200)
+                    else:
+                        return JsonResponse({'error': 'Invalid credentials'}, status=400)
+                except CustomUser.DoesNotExist:
+                    return JsonResponse({'error': 'Invalid credentials'}, status=400)
         except Exception as e:
             return HttpResponseBadRequest(str(e))
 
