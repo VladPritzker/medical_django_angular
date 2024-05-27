@@ -1,7 +1,6 @@
 from django.http import JsonResponse, HttpResponseBadRequest, HttpResponseNotAllowed
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
-from django.contrib.auth import authenticate
 from .models import CustomUser
 import json
 
@@ -9,7 +8,7 @@ import json
 @require_http_methods(["GET", "POST", "DELETE"])
 def users(request, user_id=None):
     if request.method == 'GET':
-        users = CustomUser.objects.all().values('id', 'username', 'email', 'is_active', 'is_staff', 'is_superuser')
+        users = CustomUser.objects.all().values('user_id', 'username', 'email', 'is_active', 'is_staff', 'is_admin')
         user_data = list(users)
         return JsonResponse(user_data, safe=False)
 
@@ -26,7 +25,7 @@ def users(request, user_id=None):
                     return HttpResponseBadRequest("Username, email, and password are required fields")
 
                 user = CustomUser.objects.create_user(username=username, email=email, password=password)
-                return JsonResponse({'id': user.id, 'username': user.username, 'email': user.email}, status=201)
+                return JsonResponse({'user_id': user.user_id, 'username': user.username, 'email': user.email}, status=201)
             else:
                 # Login user
                 email = data.get('email')
@@ -50,7 +49,7 @@ def users(request, user_id=None):
             return HttpResponseBadRequest("User ID is required")
 
         try:
-            user = CustomUser.objects.get(id=user_id)
+            user = CustomUser.objects.get(user_id=user_id)
             user.delete()
             return JsonResponse({'message': 'User deleted successfully'}, status=200)
         except CustomUser.DoesNotExist:
