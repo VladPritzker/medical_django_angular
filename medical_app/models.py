@@ -42,5 +42,8 @@ class CustomUser(AbstractBaseUser):
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username']
 
+    class Meta:
+        db_table = 'users'
+
     def __str__(self):
         return self.email
