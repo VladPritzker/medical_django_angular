@@ -1,6 +1,7 @@
 from django.http import JsonResponse, HttpResponseBadRequest, HttpResponseNotAllowed
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
+from django.contrib.auth import authenticate
 from .models import CustomUser
 import json
 
@@ -8,7 +9,7 @@ import json
 @require_http_methods(["GET", "POST", "DELETE"])
 def users(request, user_id=None):
     if request.method == 'GET':
-        users = CustomUser.objects.all().values('user_id', 'username', 'email', 'is_active', 'is_staff', 'is_admin')
+        users = CustomUser.objects.all().values('user_id', 'username', 'email', 'is_active', 'is_staff')
         user_data = list(users)
         return JsonResponse(user_data, safe=False)
 
@@ -42,7 +43,7 @@ def users(request, user_id=None):
                 except CustomUser.DoesNotExist:
                     return JsonResponse({'error': 'Invalid credentials'}, status=400)
         except Exception as e:
-            return HttpResponseBadRequest(str(e))
+            return HttpResponseBadRequest(f"Error processing request: {str(e)}")
 
     elif request.method == 'DELETE':
         if not user_id:
@@ -55,7 +56,7 @@ def users(request, user_id=None):
         except CustomUser.DoesNotExist:
             return JsonResponse({'error': 'User not found'}, status=404)
         except Exception as e:
-            return HttpResponseBadRequest(str(e))
+            return HttpResponseBadRequest(f"Error processing request: {str(e)}")
 
     else:
         return HttpResponseNotAllowed(['GET', 'POST', 'DELETE'])
