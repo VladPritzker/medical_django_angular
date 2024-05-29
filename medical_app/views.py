@@ -60,3 +60,4 @@ def users(request, user_id=None):
 
     else:
         return HttpResponseNotAllowed(['GET', 'POST', 'DELETE'])
+
