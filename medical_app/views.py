@@ -9,9 +9,23 @@ import json
 @require_http_methods(["GET", "POST", "DELETE"])
 def users(request, user_id=None):
     if request.method == 'GET':
-        users = CustomUser.objects.all().values('user_id', 'username', 'email', 'is_active', 'is_staff')
-        user_data = list(users)
-        return JsonResponse(user_data, safe=False)
+        if user_id:
+            try:
+                user = CustomUser.objects.get(user_id=user_id)
+                user_data = {
+                    'user_id': user.user_id,
+                    'username': user.username,
+                    'email': user.email,
+                    'is_active': user.is_active,
+                    'is_staff': user.is_staff
+                }
+                return JsonResponse(user_data, safe=False)
+            except CustomUser.DoesNotExist:
+                return JsonResponse({'error': 'User not found'}, status=404)
+        else:
+            users = CustomUser.objects.all().values('user_id', 'username', 'email', 'is_active', 'is_staff')
+            user_data = list(users)
+            return JsonResponse(user_data, safe=False)
 
     elif request.method == 'POST':
         try:
@@ -34,13 +48,10 @@ def users(request, user_id=None):
                 if not email or not password:
                     return HttpResponseBadRequest("Email and password are required fields")
 
-                try:
-                    user = CustomUser.objects.get(email=email)
-                    if user.check_password(password):
-                        return JsonResponse({'message': 'Login successful'}, status=200)
-                    else:
-                        return JsonResponse({'error': 'Invalid credentials'}, status=400)
-                except CustomUser.DoesNotExist:
+                user = authenticate(email=email, password=password)
+                if user:
+                    return JsonResponse({'user_id': user.user_id, 'username': user.username, 'email': user.email, 'message': 'Login successful'}, status=200)
+                else:
                     return JsonResponse({'error': 'Invalid credentials'}, status=400)
         except Exception as e:
             return HttpResponseBadRequest(f"Error processing request: {str(e)}")
@@ -60,4 +71,3 @@ def users(request, user_id=None):
 
     else:
         return HttpResponseNotAllowed(['GET', 'POST', 'DELETE'])
-
