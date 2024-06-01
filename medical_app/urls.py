@@ -6,3 +6,4 @@ urlpatterns = [
     path('users/<int:user_id>/', views.users, name='user_detail'),
 ]
  
+ 
