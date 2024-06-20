@@ -8,6 +8,7 @@ import json
 @csrf_exempt
 @require_http_methods(["GET", "POST", "DELETE"])
 def users(request, user_id=None):
+    data = None  # Initialize the variable here
     if request.method == 'GET':
         if user_id:
             try:
@@ -30,6 +31,7 @@ def users(request, user_id=None):
     elif request.method == 'POST':
         try:
             data = json.loads(request.body)
+            print("Received data:", data)  # Print the received data for debugging
             if 'username' in data:
                 # Register new user
                 username = data.get('username')
@@ -53,6 +55,8 @@ def users(request, user_id=None):
                     return JsonResponse({'user_id': user.user_id, 'username': user.username, 'email': user.email, 'message': 'Login successful'}, status=200)
                 else:
                     return JsonResponse({'error': 'Invalid credentials'}, status=400)
+        except json.JSONDecodeError:
+            return HttpResponseBadRequest("Invalid JSON")
         except Exception as e:
             return HttpResponseBadRequest(f"Error processing request: {str(e)}")
 
