@@ -1,5 +1,3 @@
-# medical_app/models.py
-
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 
@@ -31,7 +29,7 @@ class CustomUserManager(BaseUserManager):
 
 class CustomUser(AbstractBaseUser):
     user_id = models.AutoField(primary_key=True)
-    username = models.CharField(max_length=255, unique=True)
+    username = models.CharField(max_length=255, unique=False)
     email = models.EmailField(max_length=254, unique=True)
     password = models.CharField(max_length=255)
     is_active = models.BooleanField(default=True)
@@ -40,11 +38,14 @@ class CustomUser(AbstractBaseUser):
 
     objects = CustomUserManager()
 
+
+
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username']
 
     class Meta:
         db_table = 'users'
+        unique_together = ('email',)
 
     def __str__(self):
         return self.email
@@ -60,4 +61,3 @@ class Appointment(models.Model):
     doctor = models.CharField(max_length=255)
     appointment_date = models.DateTimeField()
     notes = models.TextField(blank=True, null=True)
-
