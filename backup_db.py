@@ -9,7 +9,10 @@ def backup_mysql_db():
     db_port = '3306'
 
     now = datetime.now()
-    backup_file = f"{db_name}_backup_{now.strftime('%Y%m%d_%H%M%S')}.sql"
+    backup_dir = "/Users/vladbuzhor/Library/Mobile Documents/com~apple~CloudDocs/Vlad/Study/Study/Django_Angular_React_finance /angular_django"
+    if not os.path.exists(backup_dir):
+        os.makedirs(backup_dir)
+    backup_file = os.path.join(backup_dir, f"{db_name}_backup_{now.strftime('%Y%m%d_%H%M%S')}.sql")
 
     command = f"mysqldump -u {db_user} -p{db_password} -h {db_host} -P {db_port} {db_name} > {backup_file}"
     os.system(command)
