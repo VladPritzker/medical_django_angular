@@ -32,23 +32,36 @@ def users(request, user_id=None):
         try:
             data = json.loads(request.body)
             print("Received data:", data)  # Print the received data for debugging
-            username = data.get('username')
-            email = data.get('email')
-            password = data.get('password')
+            if 'username' in data:
+                # Register new user
+                username = data.get('username')
+                email = data.get('email')
+                password = data.get('password')
 
-            if not username or not email or not password:
-                return HttpResponseBadRequest("Username, email, and password are required fields")
+                if not username or not email or not password:
+                    return HttpResponseBadRequest("Username, email, and password are required fields")
 
-            # Check if email already exists
-            if CustomUser.objects.filter(email=email).exists():
-                return HttpResponseBadRequest("Email already exists")
+                if CustomUser.objects.filter(email=email).exists():
+                    return HttpResponseBadRequest("Email already exists")
 
-            user = CustomUser.objects.create_user(username=username, email=email, password=password)
-            return JsonResponse({'user_id': user.user_id, 'username': user.username, 'email': user.email}, status=201)
+                user = CustomUser.objects.create_user(username=username, email=email, password=password)
+                return JsonResponse({'user_id': user.user_id, 'username': user.username, 'email': user.email}, status=201)
+            else:
+                # Login user
+                email = data.get('email')
+                password = data.get('password')
+                if not email or not password:
+                    return HttpResponseBadRequest("Email and password are required fields")
 
+                user = authenticate(email=email, password=password)
+                if user:
+                    return JsonResponse({'user_id': user.user_id, 'username': user.username, 'email': user.email, 'message': 'Login successful'}, status=200)
+                else:
+                    return JsonResponse({'error': 'Invalid credentials'}, status=400)
         except json.JSONDecodeError:
             return HttpResponseBadRequest("Invalid JSON")
         except Exception as e:
+            print(f"Error processing request: {str(e)}")  # Print the exception for debugging
             return HttpResponseBadRequest(f"Error processing request: {str(e)}")
 
     elif request.method == 'DELETE':
@@ -62,4 +75,7 @@ def users(request, user_id=None):
         except CustomUser.DoesNotExist:
             return JsonResponse({'error': 'User not found'}, status=404)
         except Exception as e:
-            return HttpResponseBadReque
+            return HttpResponseBadRequest(f"Error processing request: {str(e)}")
+
+    else:
+        return HttpResponseNotAllowed(['GET', 'POST', 'DELETE'])
