@@ -5,6 +5,7 @@ from django.contrib.auth import authenticate
 from .models import CustomUser
 import json
 
+
 @csrf_exempt
 @require_http_methods(["GET", "POST", "DELETE"])
 def users(request, user_id=None):
@@ -32,36 +33,23 @@ def users(request, user_id=None):
         try:
             data = json.loads(request.body)
             print("Received data:", data)  # Print the received data for debugging
-            if 'username' in data:
-                # Register new user
-                username = data.get('username')
-                email = data.get('email')
-                password = data.get('password')
+            username = data.get('username')
+            email = data.get('email')
+            password = data.get('password')
 
-                if not username or not email or not password:
-                    return HttpResponseBadRequest("Username, email, and password are required fields")
+            if not username or not email or not password:
+                return HttpResponseBadRequest("Username, email, and password are required fields")
 
-                if CustomUser.objects.filter(email=email).exists():
-                    return HttpResponseBadRequest("Email already exists")
+            # Check if email already exists
+            if CustomUser.objects.filter(email=email).exists():
+                return HttpResponseBadRequest("Email already exists")
 
-                user = CustomUser.objects.create_user(username=username, email=email, password=password)
-                return JsonResponse({'user_id': user.user_id, 'username': user.username, 'email': user.email}, status=201)
-            else:
-                # Login user
-                email = data.get('email')
-                password = data.get('password')
-                if not email or not password:
-                    return HttpResponseBadRequest("Email and password are required fields")
+            user = CustomUser.objects.create_user(username=username, email=email, password=password)
+            return JsonResponse({'user_id': user.user_id, 'username': user.username, 'email': user.email}, status=201)
 
-                user = authenticate(email=email, password=password)
-                if user:
-                    return JsonResponse({'user_id': user.user_id, 'username': user.username, 'email': user.email, 'message': 'Login successful'}, status=200)
-                else:
-                    return JsonResponse({'error': 'Invalid credentials'}, status=400)
         except json.JSONDecodeError:
             return HttpResponseBadRequest("Invalid JSON")
         except Exception as e:
-            print(f"Error processing request: {str(e)}")  # Print the exception for debugging
             return HttpResponseBadRequest(f"Error processing request: {str(e)}")
 
     elif request.method == 'DELETE':
@@ -75,7 +63,4 @@ def users(request, user_id=None):
         except CustomUser.DoesNotExist:
             return JsonResponse({'error': 'User not found'}, status=404)
         except Exception as e:
-            return HttpResponseBadRequest(f"Error processing request: {str(e)}")
-
-    else:
-        return HttpResponseNotAllowed(['GET', 'POST', 'DELETE'])
+            return HttpResponseBadReque
