@@ -67,23 +67,30 @@ def users(request, user_id=None):
         return HttpResponseNotAllowed(['GET', 'POST', 'DELETE'])
 
 @csrf_exempt
-@require_http_methods(["POST"])
+@require_http_methods(["GET", "POST"])
 def login(request):
-    try:
-        data = json.loads(request.body)
-        email = data.get('email')
-        password = data.get('password')
+    if request.method == 'GET':
+        return JsonResponse({'message': 'Login endpoint'})
 
-        if not email or not password:
-            return HttpResponseBadRequest("Email and password are required fields")
+    elif request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            email = data.get('email')
+            password = data.get('password')
 
-        user = authenticate(request, username=email, password=password)
-        if user is not None:
-            return JsonResponse({'message': 'Login successful', 'user_id': user.user_id, 'username': user.username})
-        else:
-            return JsonResponse({'error': 'Invalid credentials'}, status=401)
+            if not email or not password:
+                return HttpResponseBadRequest("Email and password are required fields")
 
-    except json.JSONDecodeError:
-        return HttpResponseBadRequest("Invalid JSON")
-    except Exception as e:
-        return HttpResponseBadRequest(f"Error processing request: {str(e)}")
+            user = authenticate(request, username=email, password=password)
+            if user is not None:
+                return JsonResponse({'message': 'Login successful', 'user_id': user.user_id, 'username': user.username})
+            else:
+                return JsonResponse({'error': 'Invalid credentials'}, status=401)
+
+        except json.JSONDecodeError:
+            return HttpResponseBadRequest("Invalid JSON")
+        except Exception as e:
+            return HttpResponseBadRequest(f"Error processing request: {str(e)}")
+
+    else:
+        return HttpResponseNotAllowed(['GET', 'POST'])
