@@ -38,8 +38,6 @@ class CustomUser(AbstractBaseUser):
 
     objects = CustomUserManager()
 
-
-
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username']
 
@@ -56,8 +54,14 @@ class HealthHistory(models.Model):
     treatment = models.TextField()
     date = models.DateField()
 
+    class Meta:
+        db_table = 'HealthHistory'
+
 class Appointment(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     doctor = models.CharField(max_length=255)
     appointment_date = models.DateTimeField()
     notes = models.TextField(blank=True, null=True)
+
+    class Meta:
+        db_table = 'Appointment'
