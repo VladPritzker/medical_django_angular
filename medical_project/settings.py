@@ -64,8 +64,8 @@ MIDDLEWARE = [
 CORS_ALLOW_ALL_ORIGINS = True
 CSRF_COOKIE_NAME = "csrftoken"
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:4200",  # Angular app URL
-    "http://127.0.0.1:4200",
+    "http://localhost:3001",  # Angular app URL
+    "http://127.0.0.1:3001",
 ]
 
 
