@@ -39,15 +39,12 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'medical_app',  # Ensure this is included
     'corsheaders',
-
 ]
-
 
 AUTH_USER_MODEL = 'medical_app.CustomUser'
 
-
-
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',  # Ensure this is at the top
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -55,20 +52,10 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'corsheaders.middleware.CorsMiddleware',  
-      
-
-
 ]
 
 CORS_ALLOW_ALL_ORIGINS = True
 CSRF_COOKIE_NAME = "csrftoken"
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3001",  # Angular app URL
-    "http://127.0.0.1:3001",
-]
-
-
 
 ROOT_URLCONF = 'medical_project.urls'
 
@@ -129,7 +116,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'America/New_York'  # Set to Eastern Time
 
 USE_I18N = True
 
@@ -145,7 +132,3 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-
-
-
