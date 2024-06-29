@@ -25,7 +25,7 @@ def users(request):
                 return HttpResponseBadRequest("User with this email already exists")
             user = User.objects.create_user(username=username, email=email, password=password)
             return JsonResponse({'message': 'Registration successful', 'user_id': user.user_id, 'username': user.username, 'email': user.email}, status=201)
-        
+         
          
         if action == 'login':
             if not email or not password:
