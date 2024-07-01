@@ -17,7 +17,7 @@ def users(request):
         email = data.get('email')
         password = data.get('password')
         username = data.get('username', None)
- 
+  
         if action == 'register':
             if not email or not password or not username:
                 return HttpResponseBadRequest("Username, email, and password are required fields")
